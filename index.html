@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZappyBuy — Terminal de Compras</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonte retro-terminal (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Share Tech Mono', monospace; }
+  </style>
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- Cor do tema do app (PWA) -->
+  <meta name="theme-color" content="#0a0a0a">
+</head>
+<body class="min-h-screen bg-black text-slate-200">
+
+  <!-- Link pular para conteúdo (Acessibilidade) -->
+  <a href="#conteudo-principal"
+     class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-amber-500 text-black px-3 py-2 rounded-none font-bold">
+    Ir para o conteúdo principal
+  </a>
+
+  <header class="border-b-4 border-amber-500 bg-black px-4 py-6">
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-4xl font-bold text-amber-400 tracking-widest">⚡ ZAPPYBUY</h1>
+      <p class="mt-1 text-emerald-400 tracking-wide">// TERMINAL DE COMPRAS — SISTEMA ONLINE</p>
+    </div>
+  </header>
+
+  <main id="conteudo-principal" class="max-w-5xl mx-auto px-4 pb-24">
+
+    <!-- Navegação responsiva -->
+    <nav class="mt-6" aria-label="Navegação principal">
+      <button
+        class="md:hidden inline-flex items-center gap-2 border-2 border-amber-500 rounded-none px-3 py-2 text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+        @click="menuAberto = !menuAberto"
+        :aria-expanded="menuAberto.toString()"
+        aria-controls="menu-principal">
+        ☰ MENU
+      </button>
+      <ul id="menu-principal" class="mt-3 md:mt-0 md:flex md:gap-8 text-amber-400 tracking-wide"
+          :class="menuAberto ? 'block' : 'hidden md:flex'">
+        <li><a class="hover:underline focus:outline-none focus:ring-2 focus:ring-amber-400" href="#vitrine">VITRINE</a></li>
+        <li><a class="hover:underline focus:outline-none focus:ring-2 focus:ring-amber-400" href="#carrinho">CARRINHO</a></li>
+        <li><a class="hover:underline focus:outline-none focus:ring-2 focus:ring-amber-400" href="#status">STATUS</a></li>
+      </ul>
+    </nav>
+
+    <!-- Painel de status / contador reativo -->
+    <section id="status" aria-labelledby="sec-status" class="border-2 border-emerald-500 p-6 mt-6">
+      <h2 id="sec-status" class="text-xl font-semibold text-emerald-400">// PAINEL DE STATUS</h2>
+      <p class="mt-2">Cliques registrados: <strong class="text-amber-400">{{ contador }}</strong></p>
+      <button
+        class="mt-4 inline-flex items-center gap-2 border-2 border-emerald-500 rounded-none px-4 py-2 text-emerald-400 hover:bg-emerald-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        aria-label="Somar um ao contador"
+        @click="contador++">+1 SINAL</button>
+    </section>
+
+    <!-- Vitrine -->
+    <section id="vitrine" aria-labelledby="sec-vitrine" class="border-2 border-amber-500 p-6 mt-6">
+      <h2 id="sec-vitrine" class="text-xl font-semibold text-amber-400">// VITRINE DE PRODUTOS</h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article v-for="p in produtos" :key="p.id" class="border-2 border-slate-600 p-4">
+          <h3 class="font-semibold text-slate-100">{{ p.nome }}</h3>
+          <p class="text-emerald-400">R$ {{ p.preco.toFixed(2) }}</p>
+          <button class="mt-2 border-2 border-amber-500 rounded-none px-3 py-1 text-amber-400 hover:bg-amber-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  @click="adicionarCarrinho(p)" aria-label="Adicionar ao carrinho">ADICIONAR</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Carrinho -->
+    <section id="carrinho" aria-labelledby="sec-carrinho" class="border-2 border-emerald-500 p-6 mt-6">
+      <h2 id="sec-carrinho" class="text-xl font-semibold text-emerald-400">// CARRINHO</h2>
+      <p class="mt-2">Itens: <strong class="text-amber-400">{{ carrinho.length }}</strong></p>
+      <ul class="mt-3 space-y-2">
+        <li v-for="(c, idx) in carrinho" :key="idx"
+            class="flex items-center justify-between gap-3 border-b border-slate-600 pb-2">
+          <span class="text-slate-100">{{ c.nome }} — R$ {{ c.preco.toFixed(2) }}</span>
+          <button class="border-2 border-slate-500 rounded-none px-3 py-1 text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  @click="removerCarrinho(idx)" aria-label="Remover do carrinho">REMOVER</button>
+        </li>
+      </ul>
+      <p class="mt-4 text-amber-400 font-semibold text-lg">
+        TOTAL: R$ {{ carrinho.reduce((t, p) => t + p.preco, 0).toFixed(2) }}
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="border-t-4 border-amber-500 max-w-5xl mx-auto px-4 py-8 text-sm text-slate-500">
+    <p>ZAPPYBUY © 2026 — Coder in code</p>
+  </footer>
+
+  <!-- Vue 3 (CDN, produção) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- App -->
+  <script src="main.js"></script>
+  <!-- Registro do Service Worker (PWA) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
